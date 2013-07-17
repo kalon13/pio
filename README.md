@@ -98,6 +98,7 @@ class My_Object(QObject):
     QObject.__init__(self, parent)
     self.hardware = Hardware_configuration.Instance()
     self.hardware('digital', 'in', 'input00').value_changed.connect(an_input_is_changed)
+    self.hardware('digital', 'in', 'input01').value_changed.connect(an_input_is_changed)
     
   @Slot(int)
   def an_input_is_changed(value):
@@ -109,7 +110,9 @@ my_object = My_Object()
 while True:
   time.sleep(1)
 ```
+## License ##
+This software is release under [MIT] (http://opensource.org/licenses/MIT) license.
 
 ## Special thanks to ##
-* [Angelo] (https://github.com/angeloc)
+* [Angelo Compagnucci] (https://github.com/angeloc)
 * [IDEA Soc. Coop.] (http://www.idea-on-line.it)
