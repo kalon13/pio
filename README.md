@@ -96,8 +96,8 @@ import time
 class My_Object(QObject):
   def __init__(self, parent=None):
     QObject.__init__(self, parent)
-    hardware = Hardware_configuration.Instance()
-    hardware('digital', 'in', 'input00').value_changed.connect(an_input_is_changed)
+    self.hardware = Hardware_configuration.Instance()
+    self.hardware('digital', 'in', 'input00').value_changed.connect(an_input_is_changed)
     
   @Slot(int)
   def an_input_is_changed(value):
@@ -109,3 +109,7 @@ my_object = My_Object()
 while True:
   time.sleep(1)
 ```
+
+## Special thanks to ##
+* [Angelo] (https://github.com/angeloc)
+* [IDEA Soc. Coop.] (http://www.idea-on-line.it)
