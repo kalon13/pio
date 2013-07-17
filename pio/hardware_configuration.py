@@ -26,6 +26,7 @@ class Hardware_configuration(QObject):
             module = self.get_module(m)
             if not module:
                 logging.error('{0} is not a module!'.format(m))
+                return self
             
             self.modules.append(module)
             self.digital_in.extend(module.digital_in)
@@ -39,7 +40,7 @@ class Hardware_configuration(QObject):
         try:
             module_type = module['access_method']['type']
             module_full_type = "{0}_module".format(module_type).capitalize()
-            module_file = ".{0}_module".format(module_type)
+            module_file = ".modules.{0}_module".format(module_type)
             module_lib = importlib.import_module(module_file, "pio")
             module_class = getattr(module_lib, module_full_type)
             return module_class(module)

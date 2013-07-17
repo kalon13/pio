@@ -2,13 +2,16 @@
 
 import time
 import random
-from .iomodule import *
+from pio.iomodule import IOModule
+from pio.libs import minimalmodbus
 
-class Dummy_module(IOModule):
+class Modbustest_module(IOModule):
+    _instrument = None
+     
     def __init__(self, module):
         IOModule.__init__(self, module)
         self.start_acquisition_thread()
-        
+         
     def acquisition(self):
         polling_time = self.parameters.get('polling_time', 0.1)
         while self.working_acquisition:
@@ -17,32 +20,29 @@ class Dummy_module(IOModule):
                                parameters = dict(input=di))
                 self.command_queue.put(command)
             time.sleep(polling_time)
-    
+     
     def open(self, parameters):
-        self.opened = True
-        
+        minimalmodbus.BAUDRATE = parameters['baudrate']
+        minimalmodbus.TIMEOUT  = 1
+        self._instrument = minimalmodbus.Instrument(parameters['port'], 1)
+        if self._instrument:        
+            self.opened =  True
+        else:
+            self.opened = False
+         
     def close(self, parameters):
         self.opened = False
-        
+         
     def write(self, parameters):
         if not self.opened:
             return
-        
         new_value = parameters['value']
+        self._instrument.write_register(parameters['output']['address'], new_value)
         parameters['output'](new_value)
-        
+         
     def read(self, parameters):
         if not self.opened:
             return
-        
-        old_value = parameters['input']['value']
-        #negate_value = 1 if old_value == 0 else 0
-        #new_value = negate_value if random.random() > 0.99 else old_value
-        new_value = old_value
-        
-        if new_value != old_value:
+        new_value = self._instrument.read_register(parameters['input']['address'])
+        if new_value != parameters['input']['value']:
             parameters['input'](new_value)
-            
-if __name__ == '__main__':
-    hc = Dummy_module(None)
-    print(hc)
