@@ -22,7 +22,7 @@ Thanks to signal-slot method you can be notified when an input changes.
 
 Example of json hardware file
 
-<pre>
+```
 {
   "modules": [
     {
@@ -61,31 +61,51 @@ Example of json hardware file
     }
   ]
 }
-</pre>
+```
 
 ### Load ###
 
 Hardware_configuration is singleton so be carefull to call always .Instance()
 
-<pre><code>from pio.hardware_configuration import Hardware_configuration
+```python
+from pio.hardware_configuration import Hardware_configuration
 
 hardware = Hardware_configuration.Instance().load('an/amazing/path/to/hardware.json')
-hardware.reset_all() # Set input/output to default value</code></pre>
+hardware.reset_all() # Set input/output to default value
+```
 
 ### Connect ###
 
 To change an output value use the function change_value(new_value):
 
-<pre><code>hardware = Hardware_configuration.Instance()
+```python
+from pio.hardware_configuration import Hardware_configuration
 
-hardware('digital', 'out', 'output00').change_value(1)</code></pre>
+hardware = Hardware_configuration.Instance()
+
+hardware('digital', 'out', 'output00').change_value(1)
+```
 
 To receive an input change connect to value_changed signal:
 
-<pre><code>@Slot(int)
-def an_input_is_changed(value):
-  print value
-  
-hardware = Hardware_configuration.Instance()
+```python
+from pio.hardware_configuration import Hardware_configuration
+from PySide.QtCore import *
+import time
 
-hardware('digital', 'out', 'input00').value_changed.connect(an_input_is_changed)</code></pre>
+class My_Object(QObject):
+  def __init__(self, parent=None):
+    QObject.__init__(self, parent)
+    hardware = Hardware_configuration.Instance()
+    hardware('digital', 'in', 'input00').value_changed.connect(an_input_is_changed)
+    
+  @Slot(int)
+  def an_input_is_changed(value):
+    # Print the new value to standard output
+    print value
+
+# Instantiate My_Object and simply wait
+my_object = My_Object()
+while True:
+  time.sleep(1)
+```
