@@ -5,11 +5,17 @@ It manages the input/output of a board using a simple json file as descriptor.
 It dinamically loads the module needed to manage the hardware and it set up an acquiring cycle.
 Thanks to signal-slot method you can be notified when an input changes.
 
-#### Dependencies ####
-* python3
+#### Core dependencies ####
 * libqtcore4
-* python3-pyside.qtcore
-* python3-serial (for some modules)
+* Python 2 or Python 3
+* Pyside (core) of the right version of python (python-pyside.qtcore or python3-pyside.qtcore)
+
+##### Optional dependencies to make some modules work #####
+* PySerial of the right version of python (python-serial or python3-serial)
+* Minimalmodbus is included
+
+Despite PIO core functionality works with both Python 2 and 3, it is designed using Python3 so some modules doesn't work with Python2.
+I hope I can works on backward compatibility soon.
 
 ## How it works ##
 
