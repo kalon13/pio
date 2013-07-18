@@ -25,10 +25,15 @@
 # OTHER DEALINGS IN THE SOFTWARE.
 ###################################################################
 
-import queue
+import sys
 import threading
 from PySide.QtCore import *
 from .input_output import digital, analogic
+
+if sys.version > '3':
+    import queue
+else:
+    import Queue as queue
 
 class IOModule(QObject):
     """ Abstract class for input/output module
