@@ -35,6 +35,7 @@ class Digital(QObject):
         QObject.__init__(self, parent)
         
         self._io_module = io_module
+        self.__variable_type__ = '__digital__'
         
         self.address = parameters.pop('address', 0)
         self.name = parameters.pop('name', 'Digital_{0}'.format(self.address))
@@ -47,8 +48,10 @@ class Digital(QObject):
         
     @Slot(int)
     def on_value_changed(self, value):
-        self._value = value
-        print(self.name, self._value)
+        value = 1 if value > 0 else 0
+        if self._value != value:
+            self._value = value
+            print(self.name, '<-D', self._value)
         
     def parseValue(self, value=None, inverse=None):
         if value == None:
@@ -62,9 +65,11 @@ class Digital(QObject):
     def __call__(self, value=None):
         if value == None:
             return self.parseValue();
-        if self.parseValue() != value or self.parseValue() == None:
-            self.value_changed.emit(self.parseValue(value))
-            return value
+        v = self.parseValue(value)
+        if self.parseValue() != v or self.parseValue() == None:
+            self.value_changed.emit(v)
+            print(self.name, '->D', v)
+        return v
     
     def __getitem__(self, name):
         if name == 'name':
@@ -100,5 +105,6 @@ class Digital_out(Digital):
         if value != self.parseValue(self._value):
             command = dict(command = 'write',
                            parameters = dict(output = self,
+                                             type = self.__variable_type__,
                                              value = self.parseValue(value)))
             self._io_module.command_queue.put(command)

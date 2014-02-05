@@ -29,14 +29,16 @@ from PySide.QtCore import *
 
 class Analogic(QObject):
     
-    value_changed = Signal(float)
+    value_changed = Signal(object)
     
     def __init__(self, io_module, parameters, parent=None):
         QObject.__init__(self, parent)
         
         self._io_module = io_module
+        self.__variable_type__ = '__analogic__'
         
         self.address = parameters.pop('address', 0)
+        self.length = parameters.pop('length', 4)
         self.name = parameters.pop('name', 'Analogic_{0}'.format(self.address))
         self.default_value = parameters.pop('default_value', 0)
         self.parameters = parameters
@@ -44,10 +46,11 @@ class Analogic(QObject):
         
         self.value_changed.connect(self.on_value_changed)
         
-    @Slot(float)
+    @Slot(object)
     def on_value_changed(self, value):
-        self._value = value
-        print(self.name, self._value)
+        if self._value != value:
+            self._value = value
+            print(self.name, '<-A', self._value)
         
     def parseValue(self, value=None):
         if value == None:
@@ -92,10 +95,11 @@ class Analogic_out(Analogic):
     def __init__(self, io_module, parameters):
         Analogic.__init__(self, io_module, parameters)
     
-    @Slot(float)
+    @Slot(object)
     def change_value(self, value):
         if value != self.parseValue(self._value):
             command = dict(command = 'write',
                            parameters = dict(output = self,
+                                             type = self.__variable_type__,
                                              value = self.parseValue(value)))
             self._io_module.command_queue.put(command)
